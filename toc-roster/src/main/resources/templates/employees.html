@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Team')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+  <div class="month-nav">
+    <h1>TOC team members</h1>
+    <a class="btn" sec:authorize="hasRole('ADMIN')" th:href="@{/employees/new}">Add team member</a>
+  </div>
+  <div class="table-wrap">
+    <table class="roster">
+      <thead><tr><th>Name</th><th>Designation</th><th>Mobile</th><th>Status</th>
+        <th sec:authorize="hasRole('ADMIN')"></th></tr></thead>
+      <tbody>
+        <tr th:each="e : ${employees}" th:classappend="${e.active} ? '' : 'inactive'">
+          <td th:text="${e.name}">Name</td>
+          <td th:text="${e.designation}">Role</td>
+          <td th:text="${e.mobile}">0133...</td>
+          <td th:text="${e.active} ? 'Active' : 'Inactive'">Active</td>
+          <td sec:authorize="hasRole('ADMIN')" class="row-actions">
+            <a th:href="@{/employees/{id}/edit(id=${e.id})}">Edit</a>
+            <form th:action="@{/employees/{id}/active(id=${e.id})}" method="post" class="inline">
+              <input type="hidden" name="value" th:value="${!e.active}">
+              <button class="link" type="submit" th:text="${e.active} ? 'Deactivate' : 'Reactivate'">Toggle</button>
+            </form>
+            <form th:action="@{/employees/{id}/delete(id=${e.id})}" method="post" class="inline"
+                  onsubmit="return confirm('Remove this team member?')">
+              <button class="link danger" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

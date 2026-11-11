@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' | TOC Roster'">TOC Roster</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="header" class="topbar">
+  <div class="brand">
+    <strong>Technology Operations Center</strong>
+    <span>Hardware, system software and network support</span>
+  </div>
+  <nav>
+    <a th:href="@{/roster}">Roster</a>
+    <a th:href="@{/employees}">Team</a>
+    <form th:action="@{/logout}" method="post" class="inline">
+      <button class="link" type="submit">Sign out (<span sec:authentication="name">user</span>)</button>
+    </form>
+  </nav>
+</header>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Duty roster')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+
+  <section class="now" aria-label="On duty now">
+    <h2>On duty now</h2>
+    <p th:if="${#maps.isEmpty(onDuty)}" class="muted">No shift is running at this moment.</p>
+    <div class="now-grid">
+      <div th:each="entry : ${onDuty}">
+        <h3 th:text="${entry.key.label}">Shift</h3>
+        <p th:text="${entry.value.isEmpty()} ? 'Nobody assigned' : ${#strings.listJoin(entry.value.![name], ', ')}">Names</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="month-nav">
+    <a class="btn" th:href="@{/roster(month=${prev})}">&larr; <span th:text="${prev}">prev</span></a>
+    <h1 th:text="'Duty roster: ' + ${#temporals.format(month.atDay(1), 'MMMM yyyy')}">Duty roster</h1>
+    <a class="btn" th:href="@{/roster(month=${next})}"><span th:text="${next}">next</span> &rarr;</a>
+    <a class="btn ghost" th:href="@{/roster/export(month=${month})}">Export CSV</a>
+    <button class="btn ghost" onclick="window.print()">Print</button>
+  </div>
+
+  <div class="table-wrap">
+    <table class="roster">
+      <thead>
+        <tr>
+          <th>Date</th><th>Day</th>
+          <th th:each="s : ${shifts}">
+            <span th:text="${s.label}">Shift</span><small th:text="${s.timeRange}">time</small>
+          </th>
+          <th class="noprint" sec:authorize="hasRole('ADMIN')"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="row : ${rows}"
+            th:classappend="${(row.weeklyOff ? 'off ' : '') + (row.date == today ? 'today' : '')}">
+          <td th:text="${#temporals.format(row.date, 'd-MMM-yy')}">1-Nov-26</td>
+          <td th:text="${#strings.capitalize(#strings.toLowerCase(row.dayOfWeek))}">Sunday</td>
+          <td th:each="s : ${shifts}">
+            <span th:each="e, st : ${row.shifts.get(s)}" class="person"
+                  th:text="${e.name} + (${st.last} ? '' : ', ')">Name</span>
+            <span th:if="${row.shifts.get(s).isEmpty()}" class="muted">Unassigned</span>
+          </td>
+          <td class="noprint" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/roster/{d}/edit(d=${row.date})}">Edit</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="info">
+    <div>
+      <h2>Escalation matrix</h2>
+      <ol class="escalation">
+        <li th:each="c : ${escalations}"><strong th:text="${c.name}">Name</strong><span th:text="${c.title}">Role</span></li>
+      </ol>
+    </div>
+    <div>
+      <h2>Contact</h2>
+      <p>IP phone: <strong th:text="${ipPhone}"></strong></p>
+      <p>Direct ext.: <strong th:text="${directExt}"></strong></p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

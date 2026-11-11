@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Edit roster')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main class="narrow">
+  <h1 th:text="'Edit ' + ${#temporals.format(date, 'EEEE, d MMMM yyyy')}">Edit day</h1>
+  <form th:action="@{/roster/{d}(d=${date})}" th:object="${form}" method="post">
+    <fieldset th:each="s : ${shifts}">
+      <legend><span th:text="${s.label}">Shift</span> <small th:text="${s.timeRange}">time</small></legend>
+      <label class="check" th:each="e : ${staff}">
+        <input type="checkbox" th:field="*{__${#strings.toLowerCase(s.name())}__}" th:value="${e.id}">
+        <span th:text="${e.name}">Name</span> <small th:text="${e.designation}">Role</small>
+      </label>
+    </fieldset>
+    <div class="actions">
+      <button class="btn" type="submit">Save roster</button>
+      <a class="btn ghost" th:href="@{/roster(month=${#temporals.format(date, 'yyyy-MM')})}">Cancel</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>
